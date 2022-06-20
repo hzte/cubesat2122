@@ -1,0 +1,14 @@
+int sensorPin = A0;                       //Selects the input pin for the photodiode
+int sensorValue = 0;                      //Variable to store the value coming from the sensor
+
+void setup(void) {
+   Serial.begin(9600);                    //Opens the serial gate
+   pinMode(sensorPin, INPUT);             //Declares the sensorPin as an INPUT
+
+}
+ 
+void loop(void) {
+   sensorValue = analogRead(sensorPin);   //Reads the value from the sensor
+   Serial.println(sensorValue);           //Prints in the serial the value the sensor measured
+
+}

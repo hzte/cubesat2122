@@ -182,44 +182,60 @@ void setup() {
                           false, // don't latch
                           true); // enabled!  
 }
-
 void loop() {
   // if some flag to start (calibration stage == true)
-    // motor turns once
-    motor.stepperRun(FULL_STEP, 200*10, rpm);
-    while motor.stepperRun(FULL_STEP, 200*10, rpm)    //loops while motor running is true?
-      // take each ldr reading
-      ldr1Value = analogRead(ldr1);
-      ldr2Value = analogRead(ldr2);
-      ldr3Value = analogRead(ldr3);
-      ldr4Value = analogRead(ldr4);
-      // write to csv - or just leave this (not needed?)
-      
-      // take gyro readings
-      sensors_event_t a, g, temp;
-      mpu.getEvent(&a, &g, &temp);          //doing anything w this?
-      
-      // take magnetometer readings
-      lis3mdl.read();                       //doing anything w this?
+    // intial ldr values
+    ldr1Value = analogRead(ldr1);
+    ldr2Value = analogRead(ldr2);
+    ldr3Value = analogRead(ldr3);
+    ldr4Value = analogRead(ldr4);
 
-      
-    motor.stepperStop();    // stop motor
+    for (int i = 0; i <= 20; i++){                  //repeat 20 times (20*10=200==full turn)
+      motor.stepperRun(FULL_STEP, 10*10, rpm);      //move 10 steps
+      ldr1Value = ldr1ValueOld;                     //assign readings from last loop as old
+      ldr2Value = ldr2ValueOld;
+      ldr3Value = ldr3ValueOld;
+      ldr4Value = ldr4ValueOld;
+      ldr1Value = analogRead(ldr1);                 // take new reading
+      if ldr1Value > ldr1ValueOld {                 // if new reading > old, assign as max reading
+        ldrMax = ldr1Value;
+      }
+      else  {                                       // else do nothing (?)  
+      }
+      if ldr2Value > ldr2ValueOld {                 // if new reading > old, assign as max reading
+        ldrMax = ldr2Value;
+      }
+      else  {                                       // else do nothing (?)  
+      }
+      if ldr3Value > ldr3ValueOld {                 // if new reading > old, assign as max reading
+        ldrMax = ldr3Value;
+      }
+      else  {                                       // else do nothing (?)  
+      }
+      if ldr4Value > ldr4ValueOld {                 // if new reading > old, assign as max reading
+        ldrMax = ldr4Value;
+      }
+      else  {                                       // else do nothing (?)  
+      }                    
+    }
+    Serial.print("Maximum light value is: ", ldrMax)  
+    
+    motor.stepperStop();    // stop motor  
+    
+    // take gyro readings
+    sensors_event_t a, g, temp;
+    mpu.getEvent(&a, &g, &temp);          //use for control loop to stay still?
 
-    // find largest ldr value
-    // could just continually re write a variable ?
-    // if ldr1 > largest value
-      // largest value = ldr1
-      // face = 1 (variable that will end saying what face has the largest value)
-    // else
-      // nothing ((is this allowed))
-    // if ldr1 != largest value
-      // start motor
-      // take ldr1 value
-      // if ldr1 == largest value (found sun)
-      // stop motor
-      // print sun found 
-    // else (means its already facing sun w/out moving
-      // stop motor
-      // print sun found 
-
+    // change to a pid loop to do this ?
+    if ldr1Value != ldrMax  {
+        motor.stepperRun(FULL_STEP, 10*10, rpm);      //move 10 steps
+    }
+    else {
+       motor.stepperStop(); 
+       // take magnetometer readings
+       lis3mdl.read(); 
+       float pi = 3.14159
+       float heading = (atan2(lis3mdl.y,lis3mdl.x) * 180) / pi;    //get compass heading  
+       Serial.print("Sun is found at: ", heading, " degrees")
+    }
 }
